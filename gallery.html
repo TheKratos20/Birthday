@@ -64,18 +64,19 @@
                 );
         }
 
-        /* MOBILE GOLD BACKGROUND SYSTEM */
-        .mobile .video-bg {
-            display: none;
-        }
-        
-        /* MAIN BG IMAGE for mobile */
-        .mobile body::before {
+        /* MOBILE GOLD BACKGROUND SYSTEM - Using body.mobile::before */
+        body.mobile .video-bg {
+    display: none !important;
+    visibility: hidden;
+    opacity: 0;
+}
+        /* MAIN BG IMAGE for mobile - FINAL FIXED VERSION */
+        body.mobile::before {
             content: "";
             position: fixed;
             inset: 0;
             background: url('assets/g.jpg') center/cover no-repeat;
-            z-index: -3;
+            z-index: -1;
             filter: blur(3px) brightness(0.55) contrast(1.1);
             transform: scale(1.05);
         }
@@ -693,8 +694,14 @@
     </audio>
 
     <script>
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) document.body.classList.add("mobile");
+        // ========== IMPROVED MOBILE DETECTION ==========
+        // Using both screen width AND user agent for maximum reliability
+        const isMobile = window.matchMedia("(max-width: 768px)").matches 
+            || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            document.body.classList.add("mobile");
+        }
 
         // Optional: subtle parallax depth effect on mobile
         if (isMobile) {
