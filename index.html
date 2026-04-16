@@ -29,10 +29,16 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html {
             height: 100%;
             width: 100%;
-            overflow: hidden;
+        }
+        
+        body {
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
             font-family: 'Poppins', sans-serif;
         }
 
@@ -44,6 +50,8 @@
             height: 100%;
             object-fit: cover;
             z-index: -2;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         /* CINEMATIC RADIAL OVERLAY - SPOTLIGHT EFFECT */
@@ -59,7 +67,7 @@
 
         .content {
             position: relative;
-            height: 100%;
+            min-height: 100vh;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -376,12 +384,25 @@
 
         /* MOBILE OPTIMIZATIONS */
         .mobile .video-bg {
-            display: none;
+            display: block;
         }
         .mobile body {
             background: black;
         }
         .mobile .custom-cursor {
+            display: none;
+        }
+        
+        /* Lighter overlay for mobile - better video visibility */
+        .mobile .overlay {
+            background: radial-gradient(circle at center, rgba(0,0,0,0.35), rgba(0,0,0,0.7));
+        }
+        
+        /* Fallback when video fails */
+        .no-video {
+            background: radial-gradient(circle at center, #111, #000);
+        }
+        .no-video .video-bg {
             display: none;
         }
 
@@ -474,9 +495,11 @@
 <body>
     <div id="cursor" class="custom-cursor">💘</div>
 
-    <video class="video-bg" autoplay muted loop playsinline>
+    <!-- Video with proper JS-based source switching (reliable) -->
+    <video class="video-bg" autoplay muted loop playsinline webkit-playsinline preload="metadata" id="bgVideo">
         <source src="assets/1.mp4" type="video/mp4">
     </video>
+    
     <div class="overlay"></div>
 
     <div id="musicIcon" class="music-toggle">
@@ -515,6 +538,25 @@
     <script>
         // Check mobile for performance
         const isMobile = window.innerWidth < 768;
+
+        // ========== RELIABLE VIDEO SWITCHING (FIXES media attribute issue) ==========
+        const video = document.getElementById("bgVideo");
+        if (video) {
+            // Set correct video source based on screen size
+            if (isMobile) {
+                video.src = "assets/1-mobile.mp4";
+            } else {
+                video.src = "assets/1.mp4";
+            }
+            video.load();
+            
+            // Attempt to play with fallback
+            video.play().catch(() => {
+                // Video failed - add fallback class
+                document.body.classList.add("no-video");
+                console.log("Video autoplay prevented, using fallback background");
+            });
+        }
 
         // Apply mobile optimizations
         if (isMobile) {
@@ -715,7 +757,6 @@
         const music = document.getElementById("bgMusic");
         const musicBtn = document.getElementById("musicIcon");
         const iconEl = musicBtn.querySelector("i");
-        const video = document.getElementById("bgVideo");
 
         music.volume = 0.6;
         music.loop = true;
@@ -779,7 +820,6 @@
             
             // Step 3: blur + zoom entire scene
             gsap.to(".content", { scale: 1.15, filter: "blur(10px)", opacity: 0, duration: 0.9, ease: "power3.inOut" });
-            gsap.to(".overlay", { opacity: 1, duration: 0.6 });
             
             // Step 4: redirect AFTER animation
             setTimeout(() => { window.location.href = "gallery.html"; }, 900);
@@ -823,7 +863,7 @@
         setInterval(() => {
             if (Math.random() < 0.15 && !isMobile) {
                 const heart = document.createElement('div');
-                heart.className = 'floating-heart';
+                heart.className = 'heart';
                 heart.innerHTML = ['💖', '❤️', '💕', '💗', '💘'][Math.floor(Math.random() * 5)];
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.fontSize = (15 + Math.random() * 15) + 'px';
