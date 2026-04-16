@@ -76,8 +76,8 @@
             position: fixed;
             inset: 0;
             background: url('assets/g.jpg') center/cover no-repeat;
-            z-index: -1;
-            filter: blur(3px) brightness(0.55) contrast(1.1);
+            z-index: -3;
+            filter: blur(2px) brightness(0.75) contrast(1.15);
             transform: scale(1.05);
         }
         
@@ -646,6 +646,29 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+/* Mobile overlay tuning */
+body.mobile .overlay {
+    background:
+        radial-gradient(circle at center,
+            rgba(0,0,0,0.35),
+            rgba(0,0,0,0.65)
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0.15),
+            rgba(0,0,0,0.6)
+        );
+}
+
+/* Stronger gold glow for mobile */
+body.mobile::after {
+    background: radial-gradient(circle,
+        rgba(255,215,0,0.12),
+        transparent 60%
+    );
+}
+
     </style>
 </head>
 <body>
